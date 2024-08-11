@@ -30,8 +30,7 @@ resource "aws_security_group" "security_group" {
 
         # CONDITIONAL EXPRESSION : IF THE VALUE OF THE ENVIRONMENT VAR IS PROD, THEN ASSIGN PROD VALUE OR DEVELOP IF ITS NOT
         cidr_blocks = var.environment == "production" ? [var.production_CIDR] : [var.develop_CIDR]
-
-
+        
         #SYNTAX IS 
         # conditiopn ? [true_value] : [false_value]
     }
