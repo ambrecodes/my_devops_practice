@@ -25,3 +25,25 @@ resource "aws_vpc" "example" {
   cidr_block = "10.0.0.0/16"
 }
 
+#example - using input and output variables 
+
+#input variable
+variable "instance_type" {
+  description = "EC2 instance type "
+  type = string
+  default = "t2.micro"
+}
+
+#calling an input variable somewhere else
+resource "aws_instance" "ec2_instance" {
+  ami = "your ami value that you choose"
+  instance_type = var.instance_type
+}
+
+#output variable 
+
+output "ec2_instance" {
+  description = "this is the EC2 instance"
+  value = aws_instance.ec2_instance
+}
+
