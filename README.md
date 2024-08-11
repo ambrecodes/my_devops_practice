@@ -1,6 +1,6 @@
 # DevOps Practice Repository
 
-Welcome to the DevOps Practice Repository! This repository is designed to help you practice and enhance your skills using various DevOps tools and technologies.
+Welcome to the DevOps Practice Repository! This repository is designed to help me practice and enhance my skills using various DevOps tools and technologies.
 
 ## Tools and Technologies
 ### Terraform: For infrastructure as code (IaC) and provisioning.
