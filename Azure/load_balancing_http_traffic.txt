@@ -1,0 +1,95 @@
+Breaking down Azure application gateway in detail from scratch : 
+
+Frontend Configuration
+
+Frontend IP Address:
+Public IP Address: This is like an address on the internet. If your application needs to be accessed from anywhere on the web (like a website that users visit), you need a public IP. This allows people to access your application through the internet.
+Private IP Address: This is like an internal address within a network. If your application only needs to be accessed from within a private network (like within a company's internal network), then you use a private IP address.
+Both IP Addresses:
+Sometimes, you might want both: a public IP for internet access and a private IP for internal use. The application gateway can handle both types of IP addresses.
+
+Backend Configuration
+
+Backend Pool:
+Think of this as a group of servers or services that will actually handle the requests from users. When users request something from your application, the application gateway sends these requests to the servers in this group.
+The backend pool can include:
+NICs (Network Interface Cards): These are network cards used by virtual machines.
+Virtual Machine Scale Sets: A way to manage a group of virtual machines.
+Public IP Addresses: For servers accessible from the internet.
+Internal IP Addresses: For servers only accessible within a private network.
+Fully Qualified Domain Names (FQDN): Like www.example.com.
+Azure App Service: A service that hosts web applications.
+You can start with an empty backend pool and add your servers or services later.
+Configure Health Probes
+Health Monitoring:
+The application gateway checks if the servers or services in the backend pool are healthy (working correctly). If it finds a server that is not responding or is unhealthy, it will temporarily remove it from the list of servers to send requests to.
+Once the unhealthy server gets fixed and starts responding again, the application gateway will add it back to the list of servers.
+Health Probe Port:
+By default, the health checks are done using the same port that the backend servers use to handle requests.
+You can customize this if needed by setting up a specific port for health checks.
+Source IP Address for Health Probes:
+If your backend servers have public IPs, the health checks come from the application gateway’s public IP.
+If your backend servers have private IPs (only accessible within a private network), the health checks come from an IP within the application gateway’s private network.
+Summary:
+Frontend Configuration: Determines how users access your application (publicly over the internet or privately within a network).
+Backend Configuration: Sets up where the application sends user requests (different servers or services).
+Health Probes: Monitors the health of these servers/services to make sure they are working properly and adjusts the backend pool accordingly.
+
+Default Health Probe
+What It Is:
+The application gateway automatically creates a "default health probe" if you don’t set up a custom one. This health probe is a way to check if your backend servers (the servers handling the actual requests) are working properly.
+How It Works:
+HTTP GET Request: The health probe makes regular HTTP GET requests to the IP addresses or domain names (FQDN) of the servers in your backend pool. This means it sends a simple request to check if the server is responding.
+HTTPS Servers: If your backend servers are set up to use HTTPS (secure HTTP), the health probe will also use HTTPS to check their health.
+Example Scenario:
+Suppose your application gateway is set up to use three servers (A, B, and C) to handle web traffic on port 80 (HTTP).
+The default health probe will check these servers every 30 seconds to see if they are responding correctly. Each probe request has a timeout of 30 seconds, meaning it will wait up to 30 seconds for a response before considering it a failure.
+A server is considered healthy if it responds with a status code between 200 and 399 (which indicates a successful response). For instance, the health probe might send a request like http://127.0.0.1/ to check if the server is working.
+If a Server Fails the Probe:
+Temporary Removal: If a server (say server A) fails to respond correctly during a health check, the application gateway will stop sending new requests to that server. This helps prevent users from being sent to a server that’s not working properly.
+Rechecking: The application gateway will keep checking server A every 30 seconds. Once server A starts responding correctly again, the gateway will start sending requests to it once more.
+Default Health Probe Settings
+Interval: The probe checks the servers every 30 seconds.
+Timeout: Each request made by the health probe waits up to 30 seconds for a response.
+Healthy Response: A response with a status code between 200 and 399 is considered healthy.
+Summary:
+Default Health Probe: Automatically checks if your backend servers are healthy.
+HTTP/HTTPS Requests: Sends requests to the servers to see if they are 
+
+Health Probe Properties
+Probe URL:
+Description: This is the URL used by the health probe to check the backend servers. The format is <protocol>://127.0.0.1:<port>/.
+Protocol: Either HTTP or HTTPS, inherited from the backend settings.
+Port: The port number used, also inherited from the backend settings.
+Interval:
+Description: The time in seconds between each health probe check. For instance, if the interval is set to 30 seconds, the probe will check the backend server every 30 seconds.
+Time-out:
+Description: The maximum time in seconds that the application gateway waits for a response to a probe before deciding that the probe has failed. If the server responds within this time, it's considered healthy.
+Unhealthy Threshold:
+Description: This is the number of consecutive failed probes required before the backend server is considered unhealthy. The behavior differs based on the version of the application gateway:
+v1 SKU: Sends additional probes quickly without waiting for the probe interval to determine health status.
+v2 SKU: Waits for the interval between each additional probe.
+
+his automatic health monitoring helps ensure that only functioning servers handle user requests, improving the reliability of your application.
+
+Probe Intervals
+
+Independent Probing:
+Multiple Instances: If your Application Gateway has multiple instances (essentially multiple copies running), each instance performs its own health checks independently. This means if the configuration specifies checking every 30 seconds, every instance will do this check every 30 seconds on its own.
+Same Configuration: All instances use the same probe settings. So, if you set up the probes to run every 30 seconds, then each instance of the Application Gateway will follow this same schedule.
+
+Multiple Listeners:
+Independent Probing for Each Listener: If your Application Gateway is configured with multiple listeners (for handling different types of traffic), each listener will also perform health checks independently. They do not share or synchronize their health checks with each other.
+Custom Health Probe
+
+More Control:
+Custom Settings: Custom probes allow you to fine-tune how health checks are performed. With custom probes, you can configure:
+Hostname: The specific name or IP address used in the health checks.
+
+URL Path: The exact path on the backend server to probe (e.g., /healthcheck).
+Probe Interval: How frequently the probe checks the backend.
+Failed Responses: How many failed responses are allowed before marking the backend instance as unhealthy.
+
+
+
+
