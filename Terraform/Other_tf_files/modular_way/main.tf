@@ -1,9 +1,8 @@
 provider "aws" {
-  region = var.region_value
+  region = "us-east-1"
 }
 
-resource "aws_instance" "this" {
-  ami                     = var.ami_id_value 
-  instance_type           = var.instance_type_value
-} 
+module "ec2_instance" {
+  source = "../../AWS_tf/ec2_creation_using_terraform"
+}
 
